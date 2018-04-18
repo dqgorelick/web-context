@@ -1,28 +1,35 @@
+if (window.NodeList && !NodeList.prototype.forEach) {
+    NodeList.prototype.forEach = function (callback, thisArg) {
+        thisArg = thisArg || window;
+        for (var i = 0; i < this.length; i++) {
+            callback.call(thisArg, this[i], i, this);
+        }
+    };
+}
+
+var RESULT_MULTIPLE = 'multiple'
+var RESULT_SINGLE = 'single'
+var RESULT_NONE = 'none'
+
 chrome.extension.sendMessage({}, function(response) {
-  var port = chrome.extension.connect({name: 'popup'});
-
 	var readyStateCheckInterval = setInterval(function() {
-	if (document.readyState === "complete") {
-		clearInterval(readyStateCheckInterval);
-    var links = $('a')
+  if (document.readyState === "complete") {
+    clearInterval(readyStateCheckInterval);
     var total = 0
-
-    for (var i=0; i<links.length; i++){
-      var link = links[i].href
-      if (!link.includes('http')) {
-          continue
-      }
-      var text = links[i].innerText
-      if (text.length < 2) {
-        continue
+    $('a').each(function(iter, link) {
+      var href = $(link)[0].href
+      if (!href.includes('http')) {
+          return
       }
       total++
-      chrome.runtime.sendMessage(link, function(response) {
-        console.log(response);
+      chrome.runtime.sendMessage(href, function(response) {
+        parsed = JSON.parse(response)
+        if (parsed.result !== RESULT_NONE) {
+          console.log('href', href);
+          $(link).css('color', 'red')
+        }
       });
-    }
-    console.log(total)
-    console.log(links.length)
+    })
 	}
 	}, 10);
 });
