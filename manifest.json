@@ -14,6 +14,7 @@
   "default_locale": "en",
   "background": {
     "scripts": [
+      "js/vendor/jquery.min.js",
       "src/bg/background.js"
     ],
     "persistent": true
@@ -37,6 +38,7 @@
         "https://www.google.com/*"
       ],
       "js": [
+        "js/vendor/jquery.min.js",
         "src/inject/inject.js"
       ]
     }
